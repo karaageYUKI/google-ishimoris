@@ -1,13 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
     <link rel="stylesheet" href="./togglePassword.css">
     <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
-    <meta charset='utf-8'>
-    <title>ログイン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .login-container input[type="button"],
+        #loginDialog input[type="button"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-container input[type="button"]:hover,
+        #loginDialog input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+        .login-container #info {
+            margin-top: 10px;
+            color: red;
+        }
+        #loginDialog {
+            display: none;
+            background: white;
+            border: solid 1px #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            text-align: center;
+        }
+        #loginDialog input[type="text"],
+        #loginDialog input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 10px;
+            border: solid 1px #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        #loginDialog input[type="button"] {
+            font-size: 16px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .password-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .password-container input[type="password"] {
+            width: calc(100% - 40px);
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    </style>
     <script>
+        function showLoginDialog() {
+            document.getElementById('loginDialog').style.display = 'block';
+        }
+
+        function closeLoginDialog() {
+            document.getElementById('loginDialog').style.display = 'none';
+        }
+
+        function validateAndSubmit() {
+            const specialWord = "yuki";
+            const inputWord = document.getElementById('wordInput').value;
+            if (inputWord === specialWord) {
+                getlevel();
+            } else {
+                document.getElementById('info').textContent = "入力が無効です。もう一度お試しください。";
+                closeLoginDialog();
+            }
+        }
+
         function getlevel() {
-            let password = prompt("パスワードを入力してください:");
+            let password = document.getElementById('passwordInput').value;
             if (password === "KJ4677") {
                 document.cookie = "yuki=True; path=/;";
                 window.location.href = "/"; // ここでリダイレクトするページを指定
@@ -19,11 +132,52 @@
                 req.open("GET", "/answer?q=" + encodeURIComponent(password));
                 req.send();
             }
+            closeLoginDialog();
+        }
+
+        function handleKeyPress(event, nextElementId) {
+            if (event.key === 'Enter') {
+                document.getElementById(nextElementId).focus();
+                event.preventDefault(); // デフォルトの動作を防ぐ
+            }
+        }
+
+        function handlePasswordKeyPress(event) {
+            if (event.key === 'Enter') {
+                validateAndSubmit();
+                event.preventDefault(); // デフォルトの動作を防ぐ
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('togglePassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
         }
     </script>
 </head>
 <body>
-    <input type="button" onClick="getlevel()" value="認証"></input>
-    <div id="info"></div>
+    <div class="login-container">
+        <h2>ログイン</h2>
+        <input type="button" onClick="showLoginDialog()" value="認証">
+        <div id="info"></div>
+    </div>
+    <div id="loginDialog">
+        <button class="close-btn" onClick="closeLoginDialog()">×</button>
+        <input type="text" id="wordInput" placeholder="ID" onkeypress="handleKeyPress(event, 'passwordInput')">
+        <div class="password-container">
+            <input type="password" id="passwordInput" placeholder="Password" onkeypress="handlePasswordKeyPress(event)">
+            <i id="togglePassword" class="fas fa-eye toggle-password" onClick="togglePasswordVisibility()"></i>
+        </div>
+        <input type="button" onClick="validateAndSubmit()" value="送信">
+    </div>
 </body>
 </html>
