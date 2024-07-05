@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: b95-s2
+    name: b95
     env: python
     region: Oregon
     plan: free
