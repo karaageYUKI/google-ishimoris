@@ -273,11 +273,15 @@ def write_bbs(request: Request,name: str = "",message: str = "",seed:Union[str,N
 def how_cached():
     return requests.get(fr"{url}bbs/how").text
 
-@app.get("/bbs/how",response_class=PlainTextResponse)
-def view_commonds(request: Request,yuki: Union[str] = Cookie(None)):
-    if not(check_cokie(yuki)):
-        return redirect("/")
-    return how_cached()
+@app.get("/bbs/how", response_class=PlainTextResponse)
+def view_schedule(request: Request, yuki: Union[str] = Cookie(None)):
+    response = requests.get("https://raw.githubusercontent.com/beta9514/texts/main/how.txt")
+    html_content = response.text
+    return html_content
+    
+@app.get("/forms",response_class=HTMLResponse)
+def view_forms(request: Request, yuki: Union[str] = Cookie(None)):
+    return template("forms.html",{"request":request})
 
 @app.get("/load_instance")
 def home():
