@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: b95
+    name: google-ishimoris
     env: python
     region: Oregon
     plan: free
